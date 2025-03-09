@@ -3,6 +3,7 @@ import './App.css';
 import SignUp from './signup-signin/SignUp.jsx'
 import SignIn from './signup-signin/SignIn.jsx';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import TodoPage from './todo/TodoPage.jsx';
 
 function App() {
   const myRoute = createBrowserRouter([
@@ -13,6 +14,10 @@ function App() {
     {
       path: "/signin",
       element: <SignIn />
+    },
+    {
+      path: "/todo",
+      element: <TodoPage />
     },
     {
       path: "/",

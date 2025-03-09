@@ -4,9 +4,12 @@ import InputLabelComponent from './InputLabelComponent';
 import FormButtonComponent from './FormButtonComponent';
 import AlreadyOptionComponent from './AlreadyOptionComponent';
 import {SignUpSignInValidator} from '../scripts/Validator.js';
+import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { isAuthenticated } from '../scripts/Auth.js';
 
 const SignUp = () => {
+  const navigate = useNavigate();
 
   const [isButtonDisabled, setButtonDisabled] = useState(false);
   
@@ -56,52 +59,66 @@ const SignUp = () => {
   }
 
   return (
+    <>
+    {
+      !isAuthenticated() ?
+      (<SignUpForm
+        onSignUpButtonClicked={onSignUpButtonClicked}
+        isButtonDisabled={isButtonDisabled}
+        />) :
+      (<></>)
+    }
+    </>
+  );
+}
+
+const SignUpForm = ({onSignUpButtonClicked, isButtonDisabled}) => {
+  return (
     <div className="container">
-    <div className="row justify-content-center">
-      <div className="col-md-3 border-primary bg-dark rounded p-4">
-        <h2 className="text-center mt-5 text-white">Sign Up</h2>
-        <form>
-          <InputLabelComponent 
-            label = "Full Name"
-            type = "text"
-            id="idSignUpFullName"
-          />
-          <InputLabelComponent
-            label = "Email address"
-            type = "email"
-            id="idSignUpEmail"
-          />
-          <InputLabelComponent
-            label = "Password"
-            type = "password"
-            id="idSignUpPassword"
-          />
-          <InputLabelComponent
-            label = "Confirm password"
-            type = "password"
-            id="idSignUpConfirmPassword"
-          />
+      <div className="row justify-content-center">
+        <div className="col-md-3 border-primary bg-dark rounded p-4">
+          <h2 className="text-center mt-5 text-white">Sign Up</h2>
+          <form>
+            <InputLabelComponent 
+              label = "Full Name"
+              type = "text"
+              id="idSignUpFullName"
+            />
+            <InputLabelComponent
+              label = "Email address"
+              type = "email"
+              id="idSignUpEmail"
+            />
+            <InputLabelComponent
+              label = "Password"
+              type = "password"
+              id="idSignUpPassword"
+            />
+            <InputLabelComponent
+              label = "Confirm password"
+              type = "password"
+              id="idSignUpConfirmPassword"
+            />
+            <br/>
+            <FormButtonComponent
+              type="button"
+              classes="btn btn-primary btn-block text-white"
+              displayText='Sign Up'
+              onClickCallback={onSignUpButtonClicked}
+              isDisabled={isButtonDisabled}
+            />
+          </form>
           <br/>
-          <FormButtonComponent
-            type="button"
-            classes="btn btn-primary btn-block text-white"
-            displayText='Sign Up'
-            onClickCallback={onSignUpButtonClicked}
-            isDisabled={isButtonDisabled}
+          <AlreadyOptionComponent
+            classes="text-center mt-3 text-white"
+            displayText1="Already have an account?"
+            displayText2="Sign In"
+            toPage="/signin"
           />
-        </form>
-        <br/>
-        <AlreadyOptionComponent
-          classes="text-center mt-3 text-white"
-          displayText1="Already have an account?"
-          displayText2="Sign In"
-          toPage="/signin"
-        />
+        </div>
       </div>
     </div>
-</div>
-
-  );
+  )
 }
 
 export default SignUp
