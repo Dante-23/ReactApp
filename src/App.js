@@ -4,6 +4,8 @@ import SignUp from './signup-signin/SignUp.jsx'
 import SignIn from './signup-signin/SignIn.jsx';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import TodoPage from './todo/TodoPage.jsx';
+import ProfileDashboard from './dashboard/ProfileDashboard.jsx';
+import TodoTest from './todo/TodoTest.jsx';
 
 function App() {
   const myRoute = createBrowserRouter([
@@ -17,7 +19,11 @@ function App() {
     },
     {
       path: "/todo",
-      element: <TodoPage />
+      element: <TodoTest />
+    },
+    {
+      path: "/profile",
+      element: <ProfileDashboard />
     },
     {
       path: "/",

@@ -7,6 +7,8 @@ import {SignUpSignInValidator} from '../scripts/Validator.js';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { isAuthenticated } from '../scripts/Auth.js';
+import { Container, Row, Col, Card, Navbar, Nav, Button } from 'react-bootstrap';
+import NavBar from '../comps/NavBar.jsx';
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -60,6 +62,8 @@ const SignUp = () => {
 
   return (
     <>
+    <NavBar/>
+      <br/>
     {
       !isAuthenticated() ?
       (<SignUpForm

@@ -113,4 +113,38 @@ export class SignUpSignInValidator {
     }
   }
   
-  
+
+export class UpdateProfileValidator {
+  constructor(fullname) {
+    this.fullname = fullname;
+  }
+  validate() {
+    let obj = this.validateFullname();
+    return obj;
+  }
+
+  validateFullname() {
+    if (this.fullname === '') {
+      return {
+        status: false,
+        msg: "Fullname is required"
+      };
+    } else if (this.fullname.length > 25) {
+      return {
+        status: false,
+        msg: "Fullname must be between 3 and 25 characters."
+      };
+    } else if (!(/^[a-zA-Z]+$/.test(this.fullname))) {
+      return {
+        status: false,
+        msg: "Fullname must be contain only alphabets"
+      };
+    }
+    else {
+      return {
+        status: true,
+        msg: ""
+      };
+    }
+  }
+}

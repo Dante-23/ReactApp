@@ -1,6 +1,6 @@
 import React from 'react'
 
-const InputLabelComponent = ({label, id, type = "text"}) => {
+const InputLabelComponent = ({label, id, type = "text", value, onChangeHandler}) => {
   return (
     <div className="form-group">
       <label htmlFor="name" className='text-white'>{label}</label>
@@ -10,6 +10,8 @@ const InputLabelComponent = ({label, id, type = "text"}) => {
         id={id}
         // placeholder="John Doe"
         required=""
+        value={value}
+        onChange={onChangeHandler}
       />
     </div>
   )

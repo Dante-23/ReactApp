@@ -3,13 +3,15 @@ import { Container, Row, Col, Card, Navbar, Nav, Button } from 'react-bootstrap'
 import TodoForm from './TodoForm';
 import TodoList from './TodoList';
 import { useNavigate, Link } from 'react-router-dom';
-import { deleteAuthDataAsCookies, isAuthenticated } from '../scripts/Auth';
+import { addTodoTaskToBackend, deleteAuthDataAsCookies, isAuthenticated } from '../scripts/Auth';
+import NavBar from '../comps/NavBar';
 
 const TodoPage = () => {
     const navigate = useNavigate();
   const [todos, setTodos] = useState([]);
 
   const addTodo = (task) => {
+    addTodoTaskToBackend(task);
     const newTodos = [...todos, { text: task, isCompleted: false }];
     setTodos(newTodos);
   };
@@ -32,30 +34,7 @@ const TodoPage = () => {
 
   return (
     <>
-    <Navbar bg="dark" variant="dark" expand="lg">
-    <Container>
-        <Navbar.Brand href="#home">My To-Do App</Navbar.Brand>
-        <Navbar.Toggle aria-controls="responsive-navbar-nav" />
-        <Navbar.Collapse id="responsive-navbar-nav">
-        <Nav className="me-auto">
-            <Nav.Link href="#home">Home</Nav.Link>
-            <Nav.Link href="#features">Features</Nav.Link>
-            <Nav.Link href="#pricing">Pricing</Nav.Link>
-        </Nav>
-        <Nav>
-            {
-                isAuthenticated() ? 
-                (<Button variant="outline-light" onClick={onLogoutButtonClicked}>
-                    Logout
-                </Button>) :
-                (<Button onClick={() => navigate("/signin")} variant="outline-light">
-                    Login
-                </Button>)
-            }
-        </Nav>
-        </Navbar.Collapse>
-    </Container>
-    </Navbar>
+    <NavBar/>
     {
         isAuthenticated() ?
         (<Container className="mt-5">

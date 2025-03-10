@@ -6,6 +6,7 @@ import {SignUpSignInValidator} from '../scripts/Validator.js';
 import { useNavigate } from 'react-router-dom';
 import { isAuthenticated, storeAuthDataAsCookies } from '../scripts/Auth.js';
 import { useState, useEffect } from 'react';
+import NavBar from '../comps/NavBar.jsx';
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -54,6 +55,8 @@ const SignIn = () => {
   }
   return (
     <>
+    <NavBar/>
+    <br/>
     {
       !isAuthenticated() ?
       (<SignInForm
