@@ -10,6 +10,7 @@ import FormControl from "react-bootstrap/FormControl";
 import ListGroup from "react-bootstrap/ListGroup";
 import NavBar from "../comps/NavBar";
 import { isAuthenticated } from "../scripts/Auth";
+import { useState, useEffect } from 'react';
 
 class TodoTest extends Component {
     constructor(props) {
@@ -77,12 +78,31 @@ class TodoTest extends Component {
       }
     }
 
+    initTodos = () => {
+        const userInput = {
+            // Add a random id which is used to delete
+            id: Math.random(),
+
+            // Add a user value to list
+            value: "Test",
+        };
+        // Update list
+        const list = [...this.state.list];
+        list.push(userInput);
+
+        // reset state
+        this.setState({
+            list,
+            userInput: "",
+        });
+    }
+
     render() {
         return (
             <>
             <NavBar/>
             {
-                isAuthenticated() ?
+                !isAuthenticated() ?
             (<Container>
                 <hr />
                 <Row>

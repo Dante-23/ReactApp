@@ -118,3 +118,67 @@ export const deleteUser = async () => {
         console.error(error.message);
     }
 }
+
+export const getAllTodosOfUser = async() => {
+    const userDetail = parseCookie();
+    const url = "http://localhost:5196/api/Todo/" + userDetail['id'];
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${userDetail['token']}`,
+            // Add other headers as needed
+            }
+        });
+        const json = await response.json();
+        console.log(json);
+        if (response.ok) {
+            return json;
+        } else {
+            alert("Auth failed");
+        }
+    } catch (error) {
+        console.error(error.message);
+    }
+}
+
+/* 
+
+"Username": "test",
+"UserId": "5",
+"Description": "Pray"
+*/
+
+export const addTodoOfUser = async (taskName) => {
+    const userDetail = parseCookie();
+    const url = "http://localhost:5196/api/Todo";
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${userDetail['token']}`,
+            // Add other headers as needed
+            },
+            body: JSON.stringify({
+                Username: userDetail['username'],
+                UserId: userDetail['id'],
+                Description: taskName
+                // Include other data as needed
+            }),
+        });
+        const json = await response.json();
+        console.log(json);
+        if (response.ok) {
+            alert("Todo added successfully");
+            return json.id;
+        } else {
+            alert("Auth failed");
+            return -1;
+        }
+    } catch (error) {
+        console.error(error.message);
+        return -1;
+    }
+}

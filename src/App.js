@@ -6,6 +6,7 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import TodoPage from './todo/TodoPage.jsx';
 import ProfileDashboard from './dashboard/ProfileDashboard.jsx';
 import TodoTest from './todo/TodoTest.jsx';
+import TodoTest1 from './todo/TodoTest1.jsx';
 
 function App() {
   const myRoute = createBrowserRouter([
@@ -19,7 +20,7 @@ function App() {
     },
     {
       path: "/todo",
-      element: <TodoTest />
+      element: <TodoTest1 />
     },
     {
       path: "/profile",
