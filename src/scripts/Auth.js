@@ -1,3 +1,5 @@
+let todos = null;
+
 export const storeAuthDataAsCookies = (authData) => {
     // document.cookie = "username="+authData['JwtToken']+"";
     document.cookie = "username="+authData['username']+",token="+authData['jwtToken']+",id="+authData['id'];
@@ -21,6 +23,7 @@ const parseCookie = () => {
 
 export const deleteAuthDataAsCookies = () => {
     document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+    todos = null;
 }
 
 export const isAuthenticated = () => {
@@ -134,6 +137,7 @@ export const getAllTodosOfUser = async() => {
         const json = await response.json();
         console.log(json);
         if (response.ok) {
+            todos = json;
             return json;
         } else {
             alert("Auth failed");
@@ -143,6 +147,30 @@ export const getAllTodosOfUser = async() => {
     }
 }
 
+export const getAllCategoriesOfUser = async () => {
+    if (todos == null) {
+        await getAllTodosOfUser();
+    }
+    const categories = new Set();
+    todos.map((todo, index) => {
+        categories.add(todo.category);
+    })
+    return categories;
+}
+
+export const getAllTodoGivenCategoryOfUser = async (category) => {
+    if (todos == null) {
+        await getAllTodosOfUser();
+    }
+    const resTodos = [];
+    todos.map((todo, index) => {
+        if (todo.category === category) {
+            resTodos.push(todo);
+        }
+    })
+    return resTodos;
+}
+
 /* 
 
 "Username": "test",
@@ -150,7 +178,7 @@ export const getAllTodosOfUser = async() => {
 "Description": "Pray"
 */
 
-export const addTodoOfUser = async (taskName) => {
+export const addTodoOfUser = async (taskName, categoryName) => {
     const userDetail = parseCookie();
     const url = "http://localhost:5196/api/Todo";
     try {
@@ -164,7 +192,8 @@ export const addTodoOfUser = async (taskName) => {
             body: JSON.stringify({
                 Username: userDetail['username'],
                 UserId: userDetail['id'],
-                Description: taskName
+                Description: taskName,
+                Category: categoryName
                 // Include other data as needed
             }),
         });
@@ -180,5 +209,66 @@ export const addTodoOfUser = async (taskName) => {
     } catch (error) {
         console.error(error.message);
         return -1;
+    }
+}
+
+export const deleteTodoOfUser = async (todoId) => {
+    const userDetail = parseCookie();
+    const url = "http://localhost:5196/api/Todo";
+    try {
+        const response = await fetch(url, {
+            method: 'DELETE',
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${userDetail['token']}`,
+            // Add other headers as needed
+            },
+            body: JSON.stringify({
+                UserId: userDetail['id'],
+                Id: todoId
+                // Include other data as needed
+            }),
+        });
+        if (response.ok) {
+            alert("Todo deleted successfully");
+            return true;
+        } else {
+            alert("Auth failed");
+            return false;
+        }
+    } catch (error) {
+        console.error(error.message);
+        return false;
+    }
+}
+
+export const updateTodoOfUser = async (todoId, description) => {
+    const userDetail = parseCookie();
+    const url = "http://localhost:5196/api/Todo";
+    try {
+        const response = await fetch(url, {
+            method: 'PUT',
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${userDetail['token']}`,
+            // Add other headers as needed
+            },
+            body: JSON.stringify({
+                Id: todoId,
+                UserId: userDetail['id'],
+                Description: description
+                // Include other data as needed
+            }),
+        });
+        if (response.ok) {
+            alert("Todo updated successfully");
+            return true;
+        } else {
+            alert("Auth failed");
+            return false;
+        }
+    } catch (error) {
+        console.error(error.message);
+        return false;
     }
 }

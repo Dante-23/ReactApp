@@ -19,6 +19,7 @@ const NavBar = () => {
             <Nav className="me-auto">
                 <Nav.Link onClick={() => navigate("/profile")}>Profile</Nav.Link>
                 <Nav.Link onClick={() => navigate("/todo")}>TodoApp</Nav.Link>
+                <Nav.Link onClick={() => navigate("/budget")}>BudgetApp</Nav.Link>
                 {
                   !isAuthenticated() ?
                   (<Nav.Link onClick={() => navigate("/signup")}>SignUp</Nav.Link>) :
