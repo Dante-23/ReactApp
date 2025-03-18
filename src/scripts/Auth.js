@@ -1,3 +1,5 @@
+import { resetExpenses } from "./Expense";
+
 let todos = null;
 
 export const storeAuthDataAsCookies = (authData) => {
@@ -5,7 +7,7 @@ export const storeAuthDataAsCookies = (authData) => {
     document.cookie = "username="+authData['username']+",token="+authData['jwtToken']+",id="+authData['id'];
 }
 
-const parseCookie = () => {
+export const parseCookie = () => {
     if (document.cookie === "") return null;
     const cookies = document.cookie
     .split(',')
@@ -24,6 +26,7 @@ const parseCookie = () => {
 export const deleteAuthDataAsCookies = () => {
     document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
     todos = null;
+    resetExpenses();
 }
 
 export const isAuthenticated = () => {
