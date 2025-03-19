@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react'
 import NavBar from '../comps/NavBar';
 import { Button, Card, Container, Modal, ProgressBar, Stack, Form } from 'react-bootstrap';
 import { isAuthenticated } from '../scripts/Auth';
-import { addExpenseOfUser, getAllBudgetsOfUser, getAllExpensesGivenBudgetOfUser, getAllExpensesOfUser } from '../scripts/Expense';
+import { addExpenseOfUser, deleteExpenseOfUser, getAllBudgetsOfUser, getAllExpensesGivenBudgetOfUser, getAllExpensesOfUser } from '../scripts/Expense';
+import ErrorPopUpComponent from '../comps/PopUp';
 
 const BudgetDashboard = () => {
   return (
@@ -32,7 +33,7 @@ const BudgetComponent = () => {
     const onAddBudget = (name, maxAmount) => {
         const budget = {
             budgetName: name,
-            amount: 100,
+            amount: 0,
             maxAmount: maxAmount
         }
         setBudgets((prevBudgets) => [...prevBudgets, budget]);
@@ -81,6 +82,8 @@ const BudgetCard = ({name, amount, maxAmount}) => {
     const [showAddExpenseModal, setShowAddExpenseModal] = useState(false);
     const [showViewExpenseModal, setShowViewExpenseModal] = useState(false);
     const [expenses, setExpenses] = useState([]);
+    const [displayExpenseAmount, setDisplayExpenseAmount] = useState(amount);
+    const [showErrorPopUp, setShowErrorPopUp] = useState(false);
     const getProgressBarVariant = (amount, maxAmount) => {
         const ratio = amount / maxAmount;
         if (ratio < 0.5) return "primary";
@@ -88,10 +91,15 @@ const BudgetCard = ({name, amount, maxAmount}) => {
         else return "danger";
     }
     const onAddExpense = async (expenseName, expenseAmount) => {
-        const expense = await addExpenseOfUser(expenseName, expenseAmount, name, maxAmount);
+        if (parseInt(displayExpenseAmount) + parseInt(expenseAmount) > maxAmount) {
+            setShowAddExpenseModal(false);
+            setShowErrorPopUp(true);
+            return;
+        }
+        const expense = await addExpenseOfUser(expenseName, expenseAmount, name);
         if (expense != -1) {
-            console.log(expense);
             setExpenses((prevExpenses) => [...prevExpenses, expense]);
+            setDisplayExpenseAmount((prevAmount) => prevAmount + expense.amount);
         }
         setShowAddExpenseModal(false);
     }
@@ -105,8 +113,13 @@ const BudgetCard = ({name, amount, maxAmount}) => {
         }
         fetchData();
     }, []);
-    const onDeleteExpense = async (expenseId) => {
-        console.log("onDeleteExpense: " + expenseId);
+    const onDeleteExpense = async (expenseId, expenseAmount) => {
+        const response = await deleteExpenseOfUser(expenseId);
+        if (response != -1) {
+            setExpenses((prevExpenses) => prevExpenses.filter((expense) => expense.id !== expenseId));
+            setDisplayExpenseAmount((prevAmount) => prevAmount - expenseAmount);
+        }
+        setShowViewExpenseModal(false);
     }
   return (
     <>
@@ -114,17 +127,17 @@ const BudgetCard = ({name, amount, maxAmount}) => {
         <Card.Body>
             <Card.Title className='d-flex justify-content-between align-items-baseline fw-normal mb-3'>
                 <div className='me-2'>{name}</div>
-                <div className='d-flex align-items-baseline'>Rs. {amount}
+                <div className='d-flex align-items-baseline'>Rs. {parseInt(displayExpenseAmount)}
                     <span className='text-muted fs-6 ms-1'>/ Rs. {maxAmount}</span>
                 </div>
             </Card.Title>
-            <ProgressBar
+            {<ProgressBar
                 className='rounded-pill'
-                variant={getProgressBarVariant(amount, maxAmount)}
+                variant={getProgressBarVariant(parseInt(displayExpenseAmount), maxAmount)}
                 min={0}
                 max={maxAmount}
-                now={amount}
-            />
+                now={parseInt(displayExpenseAmount)}
+            />}
             <Stack direction='horizontal' gap="2" className='mt-4'>
                 <Button variant='outline-primary' onClick={() => setShowAddExpenseModal(true)}>Add Expense</Button>
                 <Button variant='outline-secondary' onClick={() => setShowViewExpenseModal(true)}>View Expenses</Button>
@@ -134,6 +147,12 @@ const BudgetCard = ({name, amount, maxAmount}) => {
     <AddExpenseModal show={showAddExpenseModal} handleClose={() => setShowAddExpenseModal(false)} callback={onAddExpense}/>
     <ViewExpenseModal show={showViewExpenseModal} handleClose={() => setShowViewExpenseModal(false)} expenses={expenses}
     deleteCallback={onDeleteExpense}
+    />
+    <ErrorPopUpComponent 
+    show={showErrorPopUp}
+    handleClose={() => setShowErrorPopUp(false)}
+    title="Error"
+    message="Total expense price cannot be greater than budget price. "
     />
     </>
   )
@@ -244,13 +263,13 @@ const ViewExpenseModal = ({show, handleClose, expenses, deleteCallback}) => {
                         expenses.map((expense, index) => {
                             return (
                                 <Stack direction="horizontal" gap="2">
-                                    <div className="me-auto fs-4">{expense.description}</div>
+                                    <div className="me-auto fs-4">{expense.description} - {expense.amount}</div>
                                     <div className="fs-5">
                                     </div>
                                     <Button
                                         size="sm"
                                         variant="outline-danger"
-                                        onClick={() => deleteCallback(expense.id)}
+                                        onClick={() => deleteCallback(expense.id, expense.amount)}
                                     >
                                         &times;
                                     </Button>
@@ -258,39 +277,6 @@ const ViewExpenseModal = ({show, handleClose, expenses, deleteCallback}) => {
                             )
                         })
                     }
-                    {/* <Stack direction="horizontal" gap="2">
-                        <div className="me-auto fs-4">Test 1</div>
-                        <div className="fs-5">
-                        </div>
-                        <Button
-                            size="sm"
-                            variant="outline-danger"
-                        >
-                            &times;
-                        </Button>
-                    </Stack>
-                    <Stack direction="horizontal" gap="2">
-                        <div className="me-auto fs-4">Test 1</div>
-                        <div className="fs-5">
-                        </div>
-                        <Button
-                            size="sm"
-                            variant="outline-danger"
-                        >
-                            &times;
-                        </Button>
-                    </Stack>
-                    <Stack direction="horizontal" gap="2">
-                        <div className="me-auto fs-4">Test 1</div>
-                        <div className="fs-5">
-                        </div>
-                        <Button
-                            size="sm"
-                            variant="outline-danger"
-                        >
-                            &times;
-                        </Button>
-                    </Stack> */}
                 </Stack>
             </Modal.Body>
             </Modal>

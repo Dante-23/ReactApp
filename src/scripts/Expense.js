@@ -73,7 +73,7 @@ export const getAllBudgetsOfUser = async () => {
     return budgets;
 }
 
-export const addExpenseOfUser = async (expenseName, expenseAmount, budgetName, maxAmount) => {
+export const addExpenseOfUser = async (expenseName, expenseAmount, budgetName) => {
     const userDetail = parseCookie();
     const url = BASE_URL;
     try {
@@ -89,8 +89,7 @@ export const addExpenseOfUser = async (expenseName, expenseAmount, budgetName, m
                 UserId: userDetail['id'],
                 Description: expenseName,
                 Amount: expenseAmount,
-                BudgetName: budgetName,
-                MaxAmount: maxAmount
+                BudgetName: budgetName
                 // Include other data as needed
             }),
         });
@@ -98,7 +97,37 @@ export const addExpenseOfUser = async (expenseName, expenseAmount, budgetName, m
         if (response.ok) {
             return json;
         } else {
-            alert("Auth failed");
+            alert("Add failed");
+            return -1;
+        }
+    } catch (error) {
+        console.error(error.message);
+        return -1;
+    }
+}
+
+export const deleteExpenseOfUser = async (expenseId) => {
+    const userDetail = parseCookie();
+    const url = BASE_URL;
+    try {
+        const response = await fetch(url, {
+            method: 'DELETE',
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${userDetail['token']}`,
+            // Add other headers as needed
+            },
+            body: JSON.stringify({
+                Username: userDetail['username'],
+                UserId: userDetail['id'],
+                Id: expenseId
+                // Include other data as needed
+            }),
+        });
+        if (response.ok) {
+            return 1;
+        } else {
+            alert("Delete failed");
             return -1;
         }
     } catch (error) {
