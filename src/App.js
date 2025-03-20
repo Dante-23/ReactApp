@@ -6,6 +6,7 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import ProfileDashboard from './dashboard/ProfileDashboard.jsx';
 import TodoPage from './todo/TodoPage.jsx';
 import BudgetDashboard from './expense_tracker/BudgetDashboard.jsx';
+import MainPage from './main/MainPage.jsx';
 
 function App() {
   const myRoute = createBrowserRouter([
@@ -31,7 +32,7 @@ function App() {
     },
     {
       path: "/",
-      element: <h1>Put a authenticated page here</h1>
+      element: <MainPage/>
     }
   ]);
   return (

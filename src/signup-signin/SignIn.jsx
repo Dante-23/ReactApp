@@ -43,7 +43,7 @@ const SignIn = () => {
         console.log(json);
         if (response.ok) {
           storeAuthDataAsCookies(json);
-          navigate('/budget');
+          navigate('/');
         } else {
           alert("Auth failed");
         }

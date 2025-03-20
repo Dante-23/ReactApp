@@ -13,7 +13,7 @@ const NavBar = () => {
     <>
       <Navbar bg="dark" variant="dark" expand="lg">
         <Container>
-            <Navbar.Brand href="#home">My To-Do App</Navbar.Brand>
+            <Navbar.Brand onClick={() => navigate('/')}>My To-Do App</Navbar.Brand>
             <Navbar.Toggle aria-controls="responsive-navbar-nav" />
             <Navbar.Collapse id="responsive-navbar-nav">
             <Nav className="me-auto">
