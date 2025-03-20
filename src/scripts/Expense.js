@@ -1,4 +1,5 @@
 import { parseCookie } from "./Auth";
+import { HTTP_RESPONSE_OK } from "./Constants";
 
 const BASE_URL = "http://localhost:5178/api/Budget/";
 export let expenses = null;
@@ -35,7 +36,10 @@ export const getAllExpensesOfUser = async () => {
 
 export const getAllExpensesGivenBudgetOfUser = async (budgetName) => {
     if (expenses === null) {
-        await getAllExpensesOfUser();
+        const response = await getAllExpensesOfUser();
+        // if (response.status !== HTTP_RESPONSE_OK) {
+        //     return response;
+        // }
     }
     const responseExpenses = [];
     expenses.map((expense, index) => {
@@ -73,7 +77,7 @@ export const getAllBudgetsOfUser = async () => {
     return budgets;
 }
 
-export const addExpenseOfUser = async (expenseName, expenseAmount, budgetName) => {
+export const addExpenseOfUser = async (expenseName, expenseAmount, budgetName, maxAmount) => {
     const userDetail = parseCookie();
     const url = BASE_URL;
     try {
@@ -89,7 +93,8 @@ export const addExpenseOfUser = async (expenseName, expenseAmount, budgetName) =
                 UserId: userDetail['id'],
                 Description: expenseName,
                 Amount: expenseAmount,
-                BudgetName: budgetName
+                BudgetName: budgetName,
+                MaxAmount: maxAmount
                 // Include other data as needed
             }),
         });

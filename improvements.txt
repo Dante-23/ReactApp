@@ -1,0 +1,2 @@
+Add input sanitization. 
+Add proper checks for different HTTP responses and handle accordingly. 

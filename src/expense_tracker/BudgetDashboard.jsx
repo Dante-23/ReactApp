@@ -21,6 +21,7 @@ const BudgetDashboard = () => {
 const BudgetComponent = () => {
     const [showAddBudgetModal, setShowAddBudgetModal] = useState(false);
     const [budgets, setBudgets] = useState([]);
+    const [showErrorPopUp, setShowErrorPopUp] = useState(false);
     useEffect(() => {
         async function fetchData() {
             const budgets = await getAllBudgetsOfUser();
@@ -31,6 +32,19 @@ const BudgetComponent = () => {
         fetchData();
     }, []);
     const onAddBudget = (name, maxAmount) => {
+        let canCreateBudget = true;
+        budgets.map((budget, index) => {
+            if (budget.budgetName === name) {
+                canCreateBudget = false;
+                return;
+            }
+        })
+        if (!canCreateBudget) {
+            console.log("Cannot create budget");
+            setShowAddBudgetModal(false);
+            setShowErrorPopUp(true);
+            return;
+        }
         const budget = {
             budgetName: name,
             amount: 0,
@@ -38,6 +52,9 @@ const BudgetComponent = () => {
         }
         setBudgets((prevBudgets) => [...prevBudgets, budget]);
         setShowAddBudgetModal(false);
+    }
+    const onDeleteBudget = (budgetName) => {
+        window.location.reload();
     }
     return (
         <>
@@ -61,24 +78,29 @@ const BudgetComponent = () => {
                                 name={budget.budgetName}
                                 amount={budget.amount}
                                 maxAmount={budget.maxAmount}
+                                deleteBudgetCallback={onDeleteBudget}
                             />
                         )
                     })
                 }
             </div>
         </Container>
-        {/* <AddExpenseModal show={showAddBudgetModal} handleClose={() => setShowAddBudgetModal(false)} /> */}
-        {/* <ViewExpenseModal /> */}
         <AddBudgetModal
             show={showAddBudgetModal}
             handleClose={() => setShowAddBudgetModal(false)}
             callback={onAddBudget}
         />
+        <ErrorPopUpComponent 
+        show={showErrorPopUp}
+        handleClose={() => setShowErrorPopUp(false)}
+        title="Error"
+        message="Budget with the given name already exist. "
+        />
         </>
     );
 }
 
-const BudgetCard = ({name, amount, maxAmount}) => {
+const BudgetCard = ({name, amount, maxAmount, deleteBudgetCallback}) => {
     const [showAddExpenseModal, setShowAddExpenseModal] = useState(false);
     const [showViewExpenseModal, setShowViewExpenseModal] = useState(false);
     const [expenses, setExpenses] = useState([]);
@@ -96,7 +118,7 @@ const BudgetCard = ({name, amount, maxAmount}) => {
             setShowErrorPopUp(true);
             return;
         }
-        const expense = await addExpenseOfUser(expenseName, expenseAmount, name);
+        const expense = await addExpenseOfUser(expenseName, expenseAmount, name, maxAmount);
         if (expense != -1) {
             setExpenses((prevExpenses) => [...prevExpenses, expense]);
             setDisplayExpenseAmount((prevAmount) => prevAmount + expense.amount);
@@ -114,12 +136,19 @@ const BudgetCard = ({name, amount, maxAmount}) => {
         fetchData();
     }, []);
     const onDeleteExpense = async (expenseId, expenseAmount) => {
+        setShowViewExpenseModal(false);
         const response = await deleteExpenseOfUser(expenseId);
+        let returnValue = false;
         if (response != -1) {
             setExpenses((prevExpenses) => prevExpenses.filter((expense) => expense.id !== expenseId));
             setDisplayExpenseAmount((prevAmount) => prevAmount - expenseAmount);
+            returnValue = true;
         }
-        setShowViewExpenseModal(false);
+        if (returnValue && expenses.length === 1) {
+            deleteBudgetCallback(name);
+        }
+        setShowViewExpenseModal(true);
+        return returnValue;
     }
   return (
     <>
@@ -147,6 +176,7 @@ const BudgetCard = ({name, amount, maxAmount}) => {
     <AddExpenseModal show={showAddExpenseModal} handleClose={() => setShowAddExpenseModal(false)} callback={onAddExpense}/>
     <ViewExpenseModal show={showViewExpenseModal} handleClose={() => setShowViewExpenseModal(false)} expenses={expenses}
     deleteCallback={onDeleteExpense}
+    budgetName={name}
     />
     <ErrorPopUpComponent 
     show={showErrorPopUp}
@@ -242,18 +272,18 @@ const AddExpenseModal = ({show, handleClose, callback}) => {
     );
 }
 
-const ViewExpenseModal = ({show, handleClose, expenses, deleteCallback}) => {
+const ViewExpenseModal = ({show, handleClose, expenses, deleteCallback, budgetName}) => {
     return (
         <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>
                 <Modal.Title>
                 <Stack direction="horizontal" gap="2">
-                    <div>Expenses - Test</div>
-                    <Button
+                    <div>Expenses - {budgetName}</div>
+                    {/* <Button
                         variant="outline-danger"
                     >
                         Delete
-                    </Button>
+                    </Button> */}
                 </Stack>
                 </Modal.Title>
             </Modal.Header>
